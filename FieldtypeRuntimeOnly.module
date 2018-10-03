@@ -1,0 +1,98 @@
+<?php namespace ProcessWire;
+
+/**
+ * FieldtypeRuntimeOnly
+ *
+ * Not a proper fieldtype - it only exists to provide a convenient way to add an inputfield
+ * to templates that will render some markup at runtime.
+ *
+ * Fieldtype code based on FieldtypeFieldsetOpen.
+ *
+ */
+
+class InputfieldRuntimeOnly extends Inputfield {
+
+	public function renderReady(Inputfield $parent = null, $renderValueMode = false) {
+		$field = $this->hasField;
+		$config = $this->config;
+		if(file_exists("{$this->getPath($field)}.js")) $config->scripts->add("{$this->getUrl($field)}.js");
+		if(file_exists("{$this->getPath($field)}.css")) $config->styles->add("{$this->getUrl($field)}.css");
+		return parent::renderReady($parent, $renderValueMode);
+	}
+
+	public function ___render() {
+		$field = $this->hasField;
+		$php_file = "{$this->getPath($field)}.php";
+		if(file_exists($php_file)) {
+			$page = method_exists($this->process, 'getPage') ? $this->process->getPage() : new NullPage();
+			return $this->files->render($php_file, ['page' => $page, 'field' => $field, 'inputfield' => $this]);
+		} else {
+			return "No file found at <b>{$this->getUrl($field)}.php</b>";
+		}
+	}
+
+	function getPath($field) {
+		return "{$this->config->paths->templates}RuntimeOnly/{$field->name}";
+	}
+
+	function getUrl($field) {
+		return "{$this->config->urls->templates}RuntimeOnly/{$field->name}";
+	}
+
+}
+
+
+class FieldtypeRuntimeOnly extends Fieldtype {
+
+	public static function getModuleInfo() {
+		return array(
+			'title' => 'Runtime Only',
+			'version' => '0.1.0',
+			'summary' => 'An inputfield that renders at runtime, with no data saved to the database.',
+		);
+	}
+
+	public function sanitizeValue(Page $page, Field $field, $value) {
+		return null;
+	}
+
+	public function getInputfield(Page $page, Field $field) {
+		$inputfield = $this->wire(new InputfieldRuntimeOnly());
+		$inputfield->class = $this->className();
+		return $inputfield; 
+	}
+
+	public function savePageField(Page $page, Field $field) {
+		return true; 
+	}
+
+	public function ___getConfigInputfields(Field $field) {
+		$inputfields = parent::___getConfigInputfields($field);
+		return $inputfields; 
+	}
+
+	public function ___getConfigAdvancedInputfields(Field $field) {
+		$inputfields = parent::___getConfigAdvancedInputfields($field); 
+		// Remove config fields that are not applicable
+		$inputfields->remove($inputfields->get('autojoin')); 
+		$inputfields->remove($inputfields->get('global')); 
+		return $inputfields; 
+	}
+
+	public function ___getCompatibleFieldtypes(Field $field) {
+		$fieldtypes = $this->wire(new Fieldtypes());
+		foreach($this->wire('fieldtypes') as $fieldtype) {
+			if($fieldtype instanceof FieldtypeRuntimeOnly) $fieldtypes->add($fieldtype);
+		}
+		return $fieldtypes; 
+	}
+
+	public function loadPageField(Page $page, Field $field) {
+		return '';
+	}
+
+	public function getLoadQuery(Field $field, DatabaseQuerySelect $query) {
+		return $query;
+	}
+
+}
