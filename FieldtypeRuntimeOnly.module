@@ -49,6 +49,9 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 			'title' => 'Runtime Only',
 			'version' => '0.1.0',
 			'summary' => 'An inputfield that renders at runtime, with no data saved to the database.',
+			'author' => 'Robin Sallis',
+			'href' => 'https://github.com/Toutouwai/FieldtypeRuntimeOnly',
+			'icon' => 'code',
 		);
 	}
 
