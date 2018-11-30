@@ -47,7 +47,7 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Runtime Only',
-			'version' => '0.1.1',
+			'version' => '0.1.2',
 			'summary' => 'An inputfield that renders at runtime, with no data saved to the database.',
 			'author' => 'Robin Sallis',
 			'href' => 'https://github.com/Toutouwai/FieldtypeRuntimeOnly',
@@ -110,6 +110,14 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 
 	public function getLoadQuery(Field $field, DatabaseQuerySelect $query) {
 		return $query;
+	}
+
+	/**
+	 * Install
+	 */
+	public function ___install() {
+		// Create RuntimeOnly directory
+		$this->wire()->files->mkdir($this->wire()->config->paths->templates . 'RuntimeOnly');
 	}
 
 }
