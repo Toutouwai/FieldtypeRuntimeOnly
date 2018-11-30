@@ -47,7 +47,7 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Runtime Only',
-			'version' => '0.1.0',
+			'version' => '0.1.1',
 			'summary' => 'An inputfield that renders at runtime, with no data saved to the database.',
 			'author' => 'Robin Sallis',
 			'href' => 'https://github.com/Toutouwai/FieldtypeRuntimeOnly',
@@ -71,6 +71,20 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 
 	public function ___getConfigInputfields(Field $field) {
 		$inputfields = parent::___getConfigInputfields($field);
+		$config = $this->wire()->config;
+		/* @var InputfieldMarkup $f */
+		$f = $this->wire()->modules->InputfieldMarkup;
+		$f->name = 'rendering';
+		$f->label = $this->_('Inputfield rendering');
+		$value = '<p>' . $this->_(sprintf($this->_('Inputfield markup will be rendered from a file at %s. In addition to the standard ProcessWire variables this file receives:'), "<strong>{$config->urls->templates}{$field->name}.php</strong>")) . '<br>';
+		$value .= '<strong>$page</strong> - ' . $this->_('The page being edited.') . '<br>';
+		$value .= '<strong>$field</strong> - ' . $this->_('the Field object.') . '<br>';
+		$value .= '<strong>$inputfield</strong> - ' . $this->_('the Inputfield object.') . '</p>';
+		$value .= '<p>' . $this->_(sprintf($this->_('JS file %s will be added to admin if that file exists.'), "<strong>{$config->urls->templates}{$field->name}.js</strong>")) . '<br>';
+		$value .= $this->_(sprintf($this->_('CSS file %s will be added to admin if that file exists.'), "<strong>{$config->urls->templates}{$field->name}.css</strong>")) . '<br>';
+		$value .= '</p>';
+		$f->value = $value;
+		$inputfields->add($f);
 		return $inputfields; 
 	}
 
