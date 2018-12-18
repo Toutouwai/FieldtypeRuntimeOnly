@@ -52,6 +52,7 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 			'author' => 'Robin Sallis',
 			'href' => 'https://github.com/Toutouwai/FieldtypeRuntimeOnly',
 			'icon' => 'code',
+			'requires' => 'ProcessWire>=3.0.0',
 		);
 	}
 
