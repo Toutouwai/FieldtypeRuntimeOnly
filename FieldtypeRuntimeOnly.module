@@ -63,11 +63,11 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 	public function getInputfield(Page $page, Field $field) {
 		$inputfield = $this->wire(new InputfieldRuntimeOnly());
 		$inputfield->class = $this->className();
-		return $inputfield; 
+		return $inputfield;
 	}
 
 	public function savePageField(Page $page, Field $field) {
-		return true; 
+		return true;
 	}
 
 	public function ___getConfigInputfields(Field $field) {
@@ -86,15 +86,15 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 		$value .= '</p>';
 		$f->value = $value;
 		$inputfields->add($f);
-		return $inputfields; 
+		return $inputfields;
 	}
 
 	public function ___getConfigAdvancedInputfields(Field $field) {
-		$inputfields = parent::___getConfigAdvancedInputfields($field); 
+		$inputfields = parent::___getConfigAdvancedInputfields($field);
 		// Remove config fields that are not applicable
-		$inputfields->remove($inputfields->get('autojoin')); 
-		$inputfields->remove($inputfields->get('global')); 
-		return $inputfields; 
+		$inputfields->remove($inputfields->get('autojoin'));
+		$inputfields->remove($inputfields->get('global'));
+		return $inputfields;
 	}
 
 	public function ___getCompatibleFieldtypes(Field $field) {
@@ -102,7 +102,7 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 		foreach($this->wire('fieldtypes') as $fieldtype) {
 			if($fieldtype instanceof FieldtypeRuntimeOnly) $fieldtypes->add($fieldtype);
 		}
-		return $fieldtypes; 
+		return $fieldtypes;
 	}
 
 	public function loadPageField(Page $page, Field $field) {
