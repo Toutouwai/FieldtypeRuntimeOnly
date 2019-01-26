@@ -10,3 +10,12 @@ For a field named "my_field"...
     * `$inputfield` - the Inputfield object.
 * JS file `/site/templates/RuntimeOnly/my_field.js` will be added to admin if that file exists.
 * CSS file `/site/templates/RuntimeOnly/my_field.css` will be added to admin if that file exists.
+
+## Tips
+
+If the RuntimeOnly field is used inside a Repeater field then you can get the Repeater page it is on via `$inputfield->hasPage`. E.g.
+```php
+$repeater_page = $inputfield->hasPage;
+// Use $repeater_page as needed
+echo "The name of the repeater page is $repeater_page->name";
+```
