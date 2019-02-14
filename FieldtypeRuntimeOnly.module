@@ -77,6 +77,10 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 		return $this->renderMarkup($page, $field);
 	}
 
+	public function ___sleepValue(Page $page, Field $field, $value) {
+		return true;
+	}
+
 	public function getInputfield(Page $page, Field $field) {
 		$inputfield = $this->wire(new InputfieldRuntimeOnly());
 		$inputfield->class = $this->className();
@@ -128,6 +132,41 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 
 	public function getLoadQuery(Field $field, DatabaseQuerySelect $query) {
 		return $query;
+	}
+
+	public function ___savePageField(Page $page, Field $field) {
+		// prevent saving of field
+		return true;
+	}
+
+	public function ___deletePageField(Page $page, Field $field) {
+		// deleting of page field not necessary
+		return true;
+	}
+
+	public function ___deleteField(Field $field) {
+		// deleting of field not necessary
+		return true;
+	}
+
+	public function getDatabaseSchema(Field $field) {
+		// no database schema necessary
+		return array();
+	}
+
+	public function ___createField(Field $field) {
+		// nothing necessary to create the field
+		return true;
+	}
+
+	public function getMatchQuery($query, $table, $subfield, $operator, $value) {
+		// we don't allow this field to be queried
+		throw new WireException("Field '{$query->field->name}' is runtime and not queryable");
+	}
+
+	public function getLoadQueryAutojoin(Field $field, DatabaseQuerySelect $query) {
+		// we don't allow this field to be autojoined
+		return null;
 	}
 
 	/**
