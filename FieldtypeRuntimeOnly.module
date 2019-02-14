@@ -14,29 +14,29 @@ class InputfieldRuntimeOnly extends Inputfield {
 
 	public function renderReady(Inputfield $parent = null, $renderValueMode = false) {
 		$field = $this->hasField;
-		$config = $this->config;
+		$config = $this->wire('config');
 		if(file_exists("{$this->getPath($field)}.js")) $config->scripts->add("{$this->getUrl($field)}.js");
 		if(file_exists("{$this->getPath($field)}.css")) $config->styles->add("{$this->getUrl($field)}.css");
 		return parent::renderReady($parent, $renderValueMode);
 	}
 
 	public function ___render() {
-		$field = $this->hasField;
-		$php_file = "{$this->getPath($field)}.php";
-		if(file_exists($php_file)) {
-			$page = method_exists($this->process, 'getPage') ? $this->process->getPage() : new NullPage();
-			return $this->files->render($php_file, ['page' => $page, 'field' => $field, 'inputfield' => $this]);
-		} else {
-			return "No file found at <b>{$this->getUrl($field)}.php</b>";
+		$process = $this->wire('process');
+		if($process && ($process->className() == 'ProcessPageEdit' || $process->className() == 'ProcessUser')) {
+			$page = $process->getPage();
+			return $page->{$this->name};
+		}
+		else {
+			return;
 		}
 	}
 
 	function getPath($field) {
-		return "{$this->config->paths->templates}RuntimeOnly/{$field->name}";
+		return "{$this->wire('config')->paths->templates}RuntimeOnly/{$field->name}";
 	}
 
 	function getUrl($field) {
-		return "{$this->config->urls->templates}RuntimeOnly/{$field->name}";
+		return "{$this->wire('config')->urls->templates}RuntimeOnly/{$field->name}";
 	}
 
 }
@@ -56,8 +56,25 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 		);
 	}
 
+	protected function renderMarkup(Page $page, Field $field) {
+		$php_file = "{$this->wire('config')->paths->templates}RuntimeOnly/{$field->name}.php";
+		if(file_exists($php_file)) {
+			return $this->wire('files')->render($php_file, ['page' => $page, 'field' => $field, 'inputfield' => $this]);
+		} else {
+			return "No file found at <b>{$this->wire('config')->urls->templates}RuntimeOnly/{$field->name}.php</b>";
+		}
+	}
+
+	/*public function ___markupValue(Page $page, Field $field, $value = null, $property = '') {
+		return $value;
+	}*/
+
 	public function sanitizeValue(Page $page, Field $field, $value) {
-		return null;
+		return $value;
+	}
+
+	public function ___wakeupValue(Page $page, Field $field, $value) {
+		return $this->renderMarkup($page, $field);
 	}
 
 	public function getInputfield(Page $page, Field $field) {
@@ -72,9 +89,9 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 
 	public function ___getConfigInputfields(Field $field) {
 		$inputfields = parent::___getConfigInputfields($field);
-		$config = $this->wire()->config;
+		$config = $this->wire('config');
 		/* @var InputfieldMarkup $f */
-		$f = $this->wire()->modules->InputfieldMarkup;
+		$f = $this->wire('modules')->InputfieldMarkup;
 		$f->name = 'rendering';
 		$f->label = $this->_('Inputfield rendering');
 		$value = '<p>' . $this->_(sprintf($this->_('Inputfield markup will be rendered from a file at %s. In addition to the standard ProcessWire variables this file receives:'), "<strong>{$config->urls->templates}RuntimeOnly/{$field->name}.php</strong>")) . '<br>';
@@ -118,7 +135,7 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 	 */
 	public function ___install() {
 		// Create RuntimeOnly directory
-		$this->wire()->files->mkdir($this->wire()->config->paths->templates . 'RuntimeOnly');
+		$this->wire('files')->mkdir($this->wire('config')->paths->templates . 'RuntimeOnly');
 	}
 
 }
