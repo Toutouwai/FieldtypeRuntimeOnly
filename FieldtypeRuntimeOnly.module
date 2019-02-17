@@ -6,8 +6,6 @@
  * Not a proper fieldtype - it only exists to provide a convenient way to add an inputfield
  * to templates that will render some markup at runtime.
  *
- * Fieldtype code based on FieldtypeFieldsetOpen.
- *
  */
 
 class InputfieldRuntimeOnly extends Inputfield {
@@ -21,14 +19,7 @@ class InputfieldRuntimeOnly extends Inputfield {
 	}
 
 	public function ___render() {
-		$process = $this->wire('process');
-		if($process && ($process->className() == 'ProcessPageEdit' || $process->className() == 'ProcessUser')) {
-			$page = $process->getPage();
-			return $page->{$this->name};
-		}
-		else {
-			return;
-		}
+		return $this->value;
 	}
 
 	function getPath($field) {
@@ -47,7 +38,7 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Runtime Only',
-			'version' => '0.1.2',
+			'version' => '0.1.3',
 			'summary' => 'An inputfield that renders at runtime, with no data saved to the database.',
 			'author' => 'Robin Sallis',
 			'href' => 'https://github.com/Toutouwai/FieldtypeRuntimeOnly',
@@ -61,24 +52,20 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 		if(file_exists($php_file)) {
 			return $this->wire('files')->render($php_file, ['page' => $page, 'field' => $field, 'inputfield' => $this]);
 		} else {
-			return "No file found at <b>{$this->wire('config')->urls->templates}RuntimeOnly/{$field->name}.php</b>";
+			return sprintf($this->_('No file found at <b>%s</b>'), "{$this->wire('config')->urls->templates}RuntimeOnly/{$field->name}.php");
 		}
 	}
 
-	/*public function ___markupValue(Page $page, Field $field, $value = null, $property = '') {
-		return $value;
-	}*/
-
-	public function sanitizeValue(Page $page, Field $field, $value) {
-		return $value;
+	public function ___markupValue(Page $page, Field $field, $value = null, $property = '') {
+		if($field->no_lister_render) {
+			return '';
+		} else {
+			return $this->renderMarkup($page, $field);
+		}
 	}
 
 	public function ___wakeupValue(Page $page, Field $field, $value) {
 		return $this->renderMarkup($page, $field);
-	}
-
-	public function ___sleepValue(Page $page, Field $field, $value) {
-		return true;
 	}
 
 	public function getInputfield(Page $page, Field $field) {
@@ -87,13 +74,11 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 		return $inputfield;
 	}
 
-	public function savePageField(Page $page, Field $field) {
-		return true;
-	}
-
 	public function ___getConfigInputfields(Field $field) {
 		$inputfields = parent::___getConfigInputfields($field);
 		$config = $this->wire('config');
+
+		// Rendering info
 		/* @var InputfieldMarkup $f */
 		$f = $this->wire('modules')->InputfieldMarkup;
 		$f->name = 'rendering';
@@ -107,6 +92,17 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 		$value .= '</p>';
 		$f->value = $value;
 		$inputfields->add($f);
+
+		// Prevent field rendering in Lister
+		/* @var InputfieldCheckbox $f */
+		$f = $this->wire('modules')->InputfieldCheckbox;
+		$f_name = 'no_lister_render';
+		$f->name = $f_name;
+		$f->label = $this->_('Lister rendering');
+		$f->label2 = $this->_('Do not allow field to render inside a Lister column');
+		$f->checked = $field->$f_name === 1 ? 'checked' : '';
+		$inputfields->add($f);
+
 		return $inputfields;
 	}
 
@@ -126,6 +122,27 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 		return $fieldtypes;
 	}
 
+	public function getMatchQuery($query, $table, $subfield, $operator, $value) {
+		// This field may not be queried
+		throw new WireException(sprintf($this->_("Field '%s' is runtime and not queryable"), $query->field->name));
+	}
+
+	public function getLoadQueryAutojoin(Field $field, DatabaseQuerySelect $query) {
+		return null;
+	}
+
+	public function sanitizeValue(Page $page, Field $field, $value) {
+		return $value;
+	}
+
+	public function ___sleepValue(Page $page, Field $field, $value) {
+		return $value;
+	}
+
+	public function savePageField(Page $page, Field $field) {
+		return true;
+	}
+
 	public function loadPageField(Page $page, Field $field) {
 		return '';
 	}
@@ -135,43 +152,25 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 	}
 
 	public function ___savePageField(Page $page, Field $field) {
-		// prevent saving of field
 		return true;
 	}
 
 	public function ___deletePageField(Page $page, Field $field) {
-		// deleting of page field not necessary
+		return true;
+	}
+
+	public function ___createField(Field $field) {
 		return true;
 	}
 
 	public function ___deleteField(Field $field) {
-		// deleting of field not necessary
 		return true;
 	}
 
 	public function getDatabaseSchema(Field $field) {
-		// no database schema necessary
 		return array();
 	}
 
-	public function ___createField(Field $field) {
-		// nothing necessary to create the field
-		return true;
-	}
-
-	public function getMatchQuery($query, $table, $subfield, $operator, $value) {
-		// we don't allow this field to be queried
-		throw new WireException("Field '{$query->field->name}' is runtime and not queryable");
-	}
-
-	public function getLoadQueryAutojoin(Field $field, DatabaseQuerySelect $query) {
-		// we don't allow this field to be autojoined
-		return null;
-	}
-
-	/**
-	 * Install
-	 */
 	public function ___install() {
 		// Create RuntimeOnly directory
 		$this->wire('files')->mkdir($this->wire('config')->paths->templates . 'RuntimeOnly');
