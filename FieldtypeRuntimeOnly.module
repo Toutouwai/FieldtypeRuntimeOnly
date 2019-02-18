@@ -22,11 +22,11 @@ class InputfieldRuntimeOnly extends Inputfield {
 		return $this->value;
 	}
 
-	function getPath($field) {
+	public function getPath($field) {
 		return "{$this->wire('config')->paths->templates}RuntimeOnly/{$field->name}";
 	}
 
-	function getUrl($field) {
+	public function getUrl($field) {
 		return "{$this->wire('config')->urls->templates}RuntimeOnly/{$field->name}";
 	}
 
