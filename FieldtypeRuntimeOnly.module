@@ -13,8 +13,16 @@ class InputfieldRuntimeOnly extends Inputfield {
 	public function renderReady(Inputfield $parent = null, $renderValueMode = false) {
 		$field = $this->hasField;
 		$config = $this->wire('config');
-		if(file_exists("{$this->getPath($field)}.js")) $config->scripts->add("{$this->getUrl($field)}.js");
-		if(file_exists("{$this->getPath($field)}.css")) $config->styles->add("{$this->getUrl($field)}.css");
+		$js_path = "{$this->getPath($field)}.js";
+		if(file_exists($js_path)) {
+			$modified = filemtime($js_path);
+			$config->scripts->add("{$this->getUrl($field)}.js?v=$modified");
+		}
+		$css_path = "{$this->getPath($field)}.css";
+		if(file_exists($css_path)) {
+			$modified = filemtime($css_path);
+			$config->styles->add("{$this->getUrl($field)}.css?v=$modified");
+		}
 		return parent::renderReady($parent, $renderValueMode);
 	}
 
@@ -38,7 +46,7 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Runtime Only',
-			'version' => '0.1.4',
+			'version' => '0.1.5',
 			'summary' => 'An inputfield that renders at runtime, with no data saved to the database.',
 			'author' => 'Robin Sallis',
 			'href' => 'https://github.com/Toutouwai/FieldtypeRuntimeOnly',
