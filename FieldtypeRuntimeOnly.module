@@ -30,12 +30,16 @@ class InputfieldRuntimeOnly extends Inputfield {
 		return $this->value;
 	}
 
-	public function getPath($field) {
+	public function getPath(Field $field) {
 		return "{$this->wire('config')->paths->templates}RuntimeOnly/{$field->name}";
 	}
 
-	public function getUrl($field) {
+	public function getUrl(Field $field) {
 		return "{$this->wire('config')->urls->templates}RuntimeOnly/{$field->name}";
+	}
+
+	public function ___processInput(WireInputData $input) {
+		return $this;
 	}
 
 }
@@ -46,7 +50,7 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Runtime Only',
-			'version' => '0.1.5',
+			'version' => '0.1.6',
 			'summary' => 'An inputfield that renders at runtime, with no data saved to the database.',
 			'author' => 'Robin Sallis',
 			'href' => 'https://github.com/Toutouwai/FieldtypeRuntimeOnly',
