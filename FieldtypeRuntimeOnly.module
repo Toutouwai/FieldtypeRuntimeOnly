@@ -55,7 +55,7 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 			'author' => 'Robin Sallis',
 			'href' => 'https://github.com/Toutouwai/FieldtypeRuntimeOnly',
 			'icon' => 'code',
-			'requires' => 'ProcessWire>=3.0.0',
+			'requires' => 'ProcessWire>=3.0.0, PHP>=5.4.0',
 		);
 	}
 
@@ -180,7 +180,7 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 	}
 
 	public function getDatabaseSchema(Field $field) {
-		return array();
+		return [];
 	}
 
 	public function ___install() {
