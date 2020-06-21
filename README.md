@@ -1,4 +1,4 @@
-# FieldtypeRuntimeOnly
+# Fieldtype Runtime Only
 
 Not a proper fieldtype because it doesn't save data to the database. The fieldtype only exists to provide a convenient way to add an inputfield to templates that will render some markup at runtime.
 
