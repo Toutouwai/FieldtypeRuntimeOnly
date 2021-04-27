@@ -50,7 +50,7 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Runtime Only',
-			'version' => '0.1.6',
+			'version' => '0.1.7',
 			'summary' => 'An inputfield that renders at runtime, with no data saved to the database.',
 			'author' => 'Robin Sallis',
 			'href' => 'https://github.com/Toutouwai/FieldtypeRuntimeOnly',
@@ -64,7 +64,8 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 		if(file_exists($php_file)) {
 			return $this->wire('files')->render($php_file, ['page' => $page, 'field' => $field, 'inputfield' => $this]);
 		} else {
-			return sprintf($this->_('No file found at <b>%s</b>'), "{$this->wire('config')->urls->templates}RuntimeOnly/{$field->name}.php");
+			$test = sprintf($this->_('No file found at %s'), "<b>{$this->wire('config')->urls->templates}RuntimeOnly/{$field->name}.php</b>");
+			return $test;
 		}
 	}
 
