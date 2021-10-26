@@ -50,7 +50,7 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Runtime Only',
-			'version' => '0.1.7',
+			'version' => '0.1.8',
 			'summary' => 'An inputfield that renders at runtime, with no data saved to the database.',
 			'author' => 'Robin Sallis',
 			'href' => 'https://github.com/Toutouwai/FieldtypeRuntimeOnly',
@@ -70,10 +70,10 @@ class FieldtypeRuntimeOnly extends Fieldtype {
 	}
 
 	public function ___markupValue(Page $page, Field $field, $value = null, $property = '') {
-		if($field->no_lister_render) {
+		if($field->no_lister_render && $this->wire()->process instanceof ProcessPageLister) {
 			return '';
 		} else {
-			return $this->renderMarkup($page, $field);
+			return $value;
 		}
 	}
 
