@@ -13,6 +13,15 @@ For a field named "my_field"...
 
 ## Tips
 
+### Output formatting
+
+Output formatting for `$page` will be off in the context of Edit Page so if you want to use the formatted value of a field in your RuntimeOnly code you should use [$page->getFormatted()](https://processwire.com/api/ref/page/get-formatted/). E.g.
+```php
+$value = $page->getFormatted('some_field_name');
+```
+
+### Repeaters
+
 If the RuntimeOnly field is used inside a Repeater field then you can get the Repeater page it is on via `$inputfield->hasPage`. E.g.
 ```php
 $repeater_page = $inputfield->hasPage;
