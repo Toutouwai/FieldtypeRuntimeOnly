@@ -10,7 +10,7 @@
 
 class InputfieldRuntimeOnly extends Inputfield {
 
-	public function renderReady(Inputfield $parent = null, $renderValueMode = false) {
+	public function renderReady($parent = null, $renderValueMode = false) {
 		$field = $this->hasField;
 		$config = $this->wire('config');
 		$js_path = "{$this->getPath($field)}.js";
